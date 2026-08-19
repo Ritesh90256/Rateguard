@@ -1,14 +1,13 @@
-import time
-
 class TokenBucket:
-    def __init__(self, capacity: int, refill_rate : float):
+    def __init__(self, capacity: int, refill_rate : float, clock):
         self.capacity = capacity
         self.refill_rate = refill_rate
         self.current_tokens = capacity
-        self.start_time = time.time()
+        self.clock = clock
+        self.start_time = self.clock()
 
     def allow_request(self):
-        current_time = time.time()
+        current_time = self.clock()
         elapsed_time = current_time - self.start_time
         refill_rate_per_sec = self.refill_rate/60
         tokens_to_fill = elapsed_time * refill_rate_per_sec
