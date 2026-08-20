@@ -1,4 +1,6 @@
-class TokenBucket:
+from app.rate_limiter import RateLimiter
+
+class TokenBucket(RateLimiter):
     def __init__(self, capacity: int, refill_rate : float, clock):
         self.capacity = capacity
         self.refill_rate = refill_rate

@@ -1,4 +1,6 @@
-class SlidingWindowLog:
+from app.rate_limiter import RateLimiter
+
+class SlidingWindowLog(RateLimiter):
     def __init__(self, limit : int, window_size : int, clock):
         self.limit = limit
         self.window_size = window_size
