@@ -9,7 +9,8 @@ class CheckRequest(BaseModel):
 
 algorithm_config = {
     "Client-A" : "token_bucket",
-    "Client-B" : "sliding_window_log"
+    "Client-B" : "sliding_window_log",
+    "Client-C" : "sliding_window_counter"
 }
 
 limiters = {}

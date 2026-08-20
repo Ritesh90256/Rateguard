@@ -2,6 +2,7 @@ from app.limiter_factory import LimiterFactory
 from app.token_bucket import TokenBucket
 from app.sliding_window import SlidingWindowLog
 import pytest
+from app.sliding_window_counter import SlidingWindowCounter
 
 def test_factory_creates_token_bucket():
     factory = LimiterFactory()
@@ -12,6 +13,11 @@ def test_factory_creates_sliding_window_log() :
     factory = LimiterFactory()
     limiter = factory.create_limiter("sliding_window_log")
     assert isinstance(limiter,SlidingWindowLog)
+
+def test_factory_creates_sliding_window_counter():
+     factory = LimiterFactory()
+     limiter = factory.create_limiter("sliding_window_counter")
+     assert isinstance(limiter, SlidingWindowCounter)
 
 def test_factory_rejects_invalid_algorithm():
         factory = LimiterFactory()
