@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from app.limiter_factory import LimiterFactory
+from app.redis_client import redis_client
+from app.redis_store import RedisStore
 
 app = FastAPI()
 
@@ -15,6 +17,7 @@ algorithm_config = {
 
 limiters = {}
 factory = LimiterFactory()
+store = RedisStore(redis_client)
 
 @app.post("/check")
 def check_rate_limit(request : CheckRequest):
