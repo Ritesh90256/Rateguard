@@ -1,6 +1,10 @@
 from app.token_bucket import TokenBucket
 from app.sliding_window import SlidingWindowLog
 from app.sliding_window_counter import SlidingWindowCounter
+from app.redis_client import redis_client
+from app.redis_store import RedisStore
+
+store = RedisStore(redis_client)
 
 current_time = [0]
 def fake_clock():
@@ -8,14 +12,16 @@ def fake_clock():
 
 def test_token_bucket_allows_limit():
     current_time[0] = 0
-    bucket = TokenBucket(3,10,fake_clock)
+    store.delete("rateguard:bucket:test-bucket-limit")
+    bucket = TokenBucket(3,10,fake_clock,store,"test-bucket-limit")
     assert bucket.allow_request() is True
     assert bucket.allow_request() is True
     assert bucket.allow_request() is True
 
 def test_token_bucket_denies_after_limit():
     current_time[0] = 0
-    bucket = TokenBucket(3,10,fake_clock)
+    store.delete("rateguard:bucket:test-bucket-deny")
+    bucket = TokenBucket(3,10,fake_clock,store,"test-bucket-deny")
     assert bucket.allow_request() is True
     assert bucket.allow_request() is True
     assert bucket.allow_request() is True
@@ -23,7 +29,8 @@ def test_token_bucket_denies_after_limit():
 
 def test_token_bucket_refills():
     current_time[0] = 0
-    bucket = TokenBucket(3,10,fake_clock)
+    store.delete("rateguard:bucket:test-bucket-refill")
+    bucket = TokenBucket(3,10,fake_clock,store,"test-bucket-refill")
     assert bucket.allow_request() is True
     assert bucket.allow_request() is True
     assert bucket.allow_request() is True
@@ -32,7 +39,8 @@ def test_token_bucket_refills():
 
 def test_token_bucket_never_exceeds_capacity():
     current_time[0] = 0
-    bucket = TokenBucket(3,10,fake_clock)
+    store.delete("rateguard:bucket:test-bucket-capacity")
+    bucket = TokenBucket(3,10,fake_clock,store,"test-bucket-capacity")
     assert bucket.allow_request() is True
     current_time[0] = 1000
     assert bucket.allow_request() is True

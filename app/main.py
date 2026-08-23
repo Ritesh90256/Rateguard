@@ -16,14 +16,15 @@ algorithm_config = {
 }
 
 limiters = {}
-factory = LimiterFactory()
+
 store = RedisStore(redis_client)
+factory = LimiterFactory(store)
 
 @app.post("/check")
 def check_rate_limit(request : CheckRequest):
     if request.client_id not in limiters:
         algorithm = algorithm_config.get(request.client_id, "token_bucket")
-        limiter = factory.create_limiter(algorithm)
+        limiter = factory.create_limiter(algorithm,request.client_id)
 
         limiters[request.client_id] = limiter
 
