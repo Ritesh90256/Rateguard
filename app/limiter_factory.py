@@ -13,7 +13,7 @@ class LimiterFactory:
             return TokenBucket(10,10,time.time, self.store, client_id)
         
         elif algorithm == "sliding_window_log":
-            return SlidingWindowLog(10,60,time.time)
+            return SlidingWindowLog(10,60,time.time, self.store, client_id)
         
         elif algorithm == "sliding_window_counter":
             return SlidingWindowCounter(10,60, time.time)

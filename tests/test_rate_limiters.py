@@ -50,14 +50,16 @@ def test_token_bucket_never_exceeds_capacity():
 
 def test_sliding_window_allows_limit():
     current_time[0] = 0
-    log = SlidingWindowLog(3,60,fake_clock)
+    store.delete("rateguard:bucket:test-log-limit")
+    log = SlidingWindowLog(3,60,fake_clock, store, "test-log-limit")
     assert log.allow_request() is True
     assert log.allow_request() is True
     assert log.allow_request() is True
 
 def test_sliding_window_denies_after_limit():
     current_time[0] = 0
-    log = SlidingWindowLog(3,60,fake_clock)
+    store.delete("rateguard:bucket:test-log-deny")
+    log = SlidingWindowLog(3,60,fake_clock, store, "test-log-deny")
     assert log.allow_request() is True
     assert log.allow_request() is True
     assert log.allow_request() is True
@@ -65,7 +67,8 @@ def test_sliding_window_denies_after_limit():
 
 def test_sliding_window_expires_old_requests():
     current_time[0] = 0
-    log = SlidingWindowLog(3, 60, fake_clock)
+    store.delete("rateguard:bucket:test-log-expire")
+    log = SlidingWindowLog(3,60,fake_clock, store, "test-log-expire")
     assert log.allow_request() is True
     assert log.allow_request() is True
     assert log.allow_request() is True
@@ -74,7 +77,8 @@ def test_sliding_window_expires_old_requests():
 
 def test_sliding_window_exact_boundary():
     current_time[0] = 0
-    log = SlidingWindowLog(3, 60, fake_clock)
+    store.delete("rateguard:bucket:test-log-boundary")
+    log = SlidingWindowLog(3,60,fake_clock, store, "test-log-boundary")
     assert log.allow_request() is True
     assert log.allow_request() is True
     assert log.allow_request() is True

@@ -1,24 +1,27 @@
 from app.rate_limiter import RateLimiter
+import uuid
 
 class SlidingWindowLog(RateLimiter):
-    def __init__(self, limit : int, window_size : int, clock):
+    def __init__(self, limit : int, window_size : int, clock, store, client_id):
         self.limit = limit
         self.window_size = window_size
-        self.timestamps = []
         self.clock = clock
+        self.store = store
+        self.client_id = client_id
+        self.redis_key = f"rateguard:window:{self.client_id}"
 
     def allow_request(self):
-        current_time = self.clock()
-        remaining_timestamps = []
-        start_window = current_time - self.window_size
-        for timestamp in self.timestamps:
-            if timestamp > start_window:
-                remaining_timestamps.append(timestamp)
+        current_time_ms = int(self.clock() * 1000)
+        window_size_ms = self.window_size * 1000
+        cutoff = current_time_ms - window_size_ms
 
-        self.timestamps = remaining_timestamps
+        self.store.sorted_set_remove_before(self.redis_key, cutoff)
+        count = self.store.sorted_set_count(self.redis_key)
 
-        if len(self.timestamps) >= self.limit :
+        if count >= self.limit:
             return False
+        
         else:
-            self.timestamps.append(current_time)
+            request_id = str(uuid.uuid4())
+            self.store.sorted_set_add(self.redis_key, current_time_ms, request_id)
             return True

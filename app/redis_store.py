@@ -54,3 +54,13 @@ class RedisStore:
         
         result = self.redis.eval(script, 1, key, capacity, refill_rate, current_time)
         return result
+
+    
+    def sorted_set_add(self, key, score, member):
+        self.redis.zadd(key, {member: score})
+
+    def sorted_set_remove_before(self, key, cutoff):
+        return self.redis.zremrangebyscore(key, "-inf", cutoff)
+
+    def sorted_set_count(self, key):
+        return self.redis.zcard(key)
