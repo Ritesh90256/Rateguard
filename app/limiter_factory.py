@@ -16,7 +16,7 @@ class LimiterFactory:
             return SlidingWindowLog(10,60,time.time, self.store, client_id)
         
         elif algorithm == "sliding_window_counter":
-            return SlidingWindowCounter(10,60, time.time)
+            return SlidingWindowCounter(10,60, time.time, self.store, client_id)
 
         else:
             raise ValueError(f"unsupported algorithm: {algorithm}")

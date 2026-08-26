@@ -100,3 +100,27 @@ def test_check_endpoint_uses_redis_sliding_window():
     assert response.status_code == 200
     assert response.json() == {"allowed": False}
 
+def test_check_endpoint_uses_redis_sliding_window_counter():
+    client_id = "Client-C"
+    key = f"rateguard:counter:{client_id}"
+
+    store.delete(key)
+    limiters.pop(client_id, None)
+
+    for _ in range(10):
+        response = client.post(
+            "/check",
+            json={"client_id": client_id}
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"allowed": True}
+
+    response = client.post(
+        "/check",
+        json={"client_id": client_id}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"allowed": False}
+

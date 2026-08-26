@@ -50,7 +50,7 @@ def test_token_bucket_never_exceeds_capacity():
 
 def test_sliding_window_allows_limit():
     current_time[0] = 0
-    store.delete("rateguard:bucket:test-log-limit")
+    store.delete("rateguard:window:test-log-limit")
     log = SlidingWindowLog(3,60,fake_clock, store, "test-log-limit")
     assert log.allow_request() is True
     assert log.allow_request() is True
@@ -58,7 +58,7 @@ def test_sliding_window_allows_limit():
 
 def test_sliding_window_denies_after_limit():
     current_time[0] = 0
-    store.delete("rateguard:bucket:test-log-deny")
+    store.delete("rateguard:window:test-log-deny")
     log = SlidingWindowLog(3,60,fake_clock, store, "test-log-deny")
     assert log.allow_request() is True
     assert log.allow_request() is True
@@ -67,7 +67,7 @@ def test_sliding_window_denies_after_limit():
 
 def test_sliding_window_expires_old_requests():
     current_time[0] = 0
-    store.delete("rateguard:bucket:test-log-expire")
+    store.delete("rateguard:window:test-log-expire")
     log = SlidingWindowLog(3,60,fake_clock, store, "test-log-expire")
     assert log.allow_request() is True
     assert log.allow_request() is True
@@ -77,7 +77,7 @@ def test_sliding_window_expires_old_requests():
 
 def test_sliding_window_exact_boundary():
     current_time[0] = 0
-    store.delete("rateguard:bucket:test-log-boundary")
+    store.delete("rateguard:window:test-log-boundary")
     log = SlidingWindowLog(3,60,fake_clock, store, "test-log-boundary")
     assert log.allow_request() is True
     assert log.allow_request() is True
@@ -87,47 +87,117 @@ def test_sliding_window_exact_boundary():
 
 def test_sliding_window_counter_allows_limit():
     current_time[0] = 0
-    counter = SlidingWindowCounter(3, 60, fake_clock)
+
+    client_id = "test-counter-limit"
+    key = f"rateguard:counter:{client_id}"
+    store.delete(key)
+
+    counter = SlidingWindowCounter(
+        3,
+        60,
+        fake_clock,
+        store,
+        client_id
+    )
+
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is True
+
 
 def test_sliding_window_counter_denies_after_limit():
     current_time[0] = 0
-    counter = SlidingWindowCounter(3, 60, fake_clock)
+
+    client_id = "test-counter-deny"
+    key = f"rateguard:counter:{client_id}"
+    store.delete(key)
+
+    counter = SlidingWindowCounter(
+        3,
+        60,
+        fake_clock,
+        store,
+        client_id
+    )
+
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is False
+
 
 def test_sliding_window_counter_weighs_previous_window():
     current_time[0] = 0
-    counter = SlidingWindowCounter(5,60,fake_clock)
+
+    client_id = "test-counter-weight"
+    key = f"rateguard:counter:{client_id}"
+    store.delete(key)
+
+    counter = SlidingWindowCounter(
+        5,
+        60,
+        fake_clock,
+        store,
+        client_id
+    )
+
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is True
+
     current_time[0] = 90
+
     assert counter.allow_request() is True
+
 
 def test_sliding_window_counter_uses_weighted_previous_count():
     current_time[0] = 0
-    counter = SlidingWindowCounter(3,60,fake_clock)
+
+    client_id = "test-counter-weighted-decision"
+    key = f"rateguard:counter:{client_id}"
+    store.delete(key)
+
+    counter = SlidingWindowCounter(
+        3,
+        60,
+        fake_clock,
+        store,
+        client_id
+    )
+
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is True
+
     current_time[0] = 90
+
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is False
 
+
 def test_sliding_window_counter_resets_after_skipping_windows():
     current_time[0] = 0
-    counter = SlidingWindowCounter(3,60,fake_clock)
+
+    client_id = "test-counter-reset"
+    key = f"rateguard:counter:{client_id}"
+    store.delete(key)
+
+    counter = SlidingWindowCounter(
+        3,
+        60,
+        fake_clock,
+        store,
+        client_id
+    )
+
     assert counter.allow_request() is True
     assert counter.allow_request() is True
     assert counter.allow_request() is True
+
     current_time[0] = 120
+
     assert counter.allow_request() is True
 
 
