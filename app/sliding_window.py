@@ -13,15 +13,8 @@ class SlidingWindowLog(RateLimiter):
     def allow_request(self):
         current_time_ms = int(self.clock() * 1000)
         window_size_ms = self.window_size * 1000
-        cutoff = current_time_ms - window_size_ms
+        request_id = str(uuid.uuid4())
 
-        self.store.sorted_set_remove_before(self.redis_key, cutoff)
-        count = self.store.sorted_set_count(self.redis_key)
+        result = self.store.sliding_window_log_atomic(self.redis_key, self.limit, window_size_ms, current_time_ms, request_id)
 
-        if count >= self.limit:
-            return False
-        
-        else:
-            request_id = str(uuid.uuid4())
-            self.store.sorted_set_add(self.redis_key, current_time_ms, request_id)
-            return True
+        return bool(result)

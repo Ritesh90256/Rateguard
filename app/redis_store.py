@@ -64,3 +64,28 @@ class RedisStore:
 
     def sorted_set_count(self, key):
         return self.redis.zcard(key)
+
+    def sliding_window_log_atomic(self, key, limit, window_ms, current_time_ms, request_id):
+        script = """
+                local limit = tonumber(ARGV[1])
+                local window_ms = tonumber(ARGV[2])
+                local current_time_ms = tonumber(ARGV[3])
+                local request_id = ARGV[4]
+
+                local cutoff = current_time_ms - window_ms
+                
+                redis.call("ZREMRANGEBYSCORE", KEYS[1], "-inf", cutoff)
+
+                local count = redis.call("ZCARD", KEYS[1])
+
+                if count >= limit then
+                    return 0
+                end
+
+                redis.call("ZADD", KEYS[1], current_time_ms, request_id)
+                return 1
+
+                """
+
+        result = self.redis.eval(script, 1, key, limit, window_ms, current_time_ms, request_id)
+        return result
