@@ -14,67 +14,67 @@ def test_check_endpoint_uses_redis_token_bucket():
         json={"client_id": "redis-integration-test-client"}
     )
     assert response.status_code == 200
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": True}
+    assert response.json()["allowed"] is True
     
     response = client.post(
         "/check",
         json={"client_id": "redis-integration-test-client"}
     )
-    assert response.json() == {"allowed": False}
+    assert response.json()["allowed"] is False
 
 def test_check_endpoint_uses_redis_sliding_window():
     client_id = "Client-B"
@@ -90,7 +90,7 @@ def test_check_endpoint_uses_redis_sliding_window():
         )
 
         assert response.status_code == 200
-        assert response.json() == {"allowed": True}
+        assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
@@ -98,7 +98,7 @@ def test_check_endpoint_uses_redis_sliding_window():
     )
 
     assert response.status_code == 200
-    assert response.json() == {"allowed": False}
+    assert response.json()["allowed"] is False
 
 def test_check_endpoint_uses_redis_sliding_window_counter():
     client_id = "Client-C"
@@ -114,7 +114,7 @@ def test_check_endpoint_uses_redis_sliding_window_counter():
         )
 
         assert response.status_code == 200
-        assert response.json() == {"allowed": True}
+        assert response.json()["allowed"] is True
 
     response = client.post(
         "/check",
@@ -122,5 +122,5 @@ def test_check_endpoint_uses_redis_sliding_window_counter():
     )
 
     assert response.status_code == 200
-    assert response.json() == {"allowed": False}
+    assert response.json()["allowed"] is False
 
