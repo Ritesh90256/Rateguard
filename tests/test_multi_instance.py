@@ -15,7 +15,7 @@ def test_multiple_instances_share_rate_limit_state():
     client_1 = TestClient(app_1)
     client_2 = TestClient(app_2)
 
-    for _ in range(10):
+    for _ in range(100):
         response = client_1.post(
             "/check",
             json={"client_id": "Client-B"}
@@ -64,7 +64,7 @@ def test_nginx_preserves_shared_rate_limit():
 
     responses = []
 
-    for _ in range(10):
+    for _ in range(100):
         response = requests.post(
             "http://127.0.0.1:8000/check",
             json={"client_id": "Client-B"}

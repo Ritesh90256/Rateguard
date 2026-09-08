@@ -83,7 +83,7 @@ def test_check_endpoint_uses_redis_sliding_window():
     store.delete(key)
     limiters.pop(client_id, None)
 
-    for _ in range(10):
+    for _ in range(100):
         response = client.post(
             "/check",
             json={"client_id": client_id}
@@ -107,7 +107,7 @@ def test_check_endpoint_uses_redis_sliding_window_counter():
     store.delete(key)
     limiters.pop(client_id, None)
 
-    for _ in range(10):
+    for _ in range(1000):
         response = client.post(
             "/check",
             json={"client_id": client_id}
